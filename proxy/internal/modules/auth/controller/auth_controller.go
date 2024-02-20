@@ -111,7 +111,7 @@ func (a *Auth) Register(w http.ResponseWriter, r *http.Request) {
 
 	regResp := RegisterReponse{
 		Success: true,
-		Message: "пользователь успешно зарегистрирован",
+		Message: "Пользователь успешно зарегистрирован",
 	}
 
 	a.OutputJSON(w, regResp)

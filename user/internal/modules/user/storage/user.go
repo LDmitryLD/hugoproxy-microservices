@@ -5,6 +5,7 @@ import (
 	"projects/LDmitryLD/hugoproxy-microservices/user/internal/models"
 )
 
+//go:generate go run github.com/vektra/mockery/v2@v2.35.4 --name=UserStorager
 type UserStorager interface {
 	GetByEmail(email string) (models.UserDTO, error)
 	Create(user models.UserDTO) error
