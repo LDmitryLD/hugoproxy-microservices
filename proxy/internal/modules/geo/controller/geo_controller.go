@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var (
@@ -88,10 +90,16 @@ func (g *GeoController) Search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	out := g.geo.SearchAddresses(service.SearchAddressesIn{Query: searchRequest.Query})
+	out := g.geo.SearchAddresses(r.Context(), service.SearchAddressesIn{Query: searchRequest.Query})
 	if out.Err != nil {
-		g.ErrorInternal(w, out.Err)
-		return
+		switch status.Code(out.Err) {
+		case codes.ResourceExhausted:
+			g.ErrorToManyRequests(w, out.Err)
+			return
+		default:
+			g.ErrorInternal(w, out.Err)
+			return
+		}
 	}
 
 	searchResponse := SearchResponse{

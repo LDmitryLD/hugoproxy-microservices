@@ -77,6 +77,7 @@ func (u *UserRPCClient) Create(ctx context.Context, user models.User) error {
 		Name:     user.Name,
 		Email:    user.Email,
 		Password: user.Password,
+		Phone:    user.Phone,
 	}
 	var out CreateOut
 
@@ -101,27 +102,22 @@ func NewUserGRPCClient(client pb.UsererClient) *UserGRPCClient {
 func (u *UserGRPCClient) Profile(ctx context.Context, email string) (models.User, error) {
 	res, err := u.client.Profile(ctx, &pb.ProfileRequest{Email: email})
 	if err != nil {
-		log.Println("auth: UserGRPCClient.Profile err:", err)
 		return models.User{}, err
 	}
-	// if err != nil {
-	// 	if status.Code(err) == codes.NotFound {
-	// 		return models.User{}, fmt.Errorf("not found")
-	// 	}
-	// }
 
 	user := models.User{
+		ID:       int(res.Id),
 		Name:     res.Name,
 		Email:    res.Email,
 		Password: res.Passwrd,
+		Phone:    res.Phone,
 	}
 
 	return user, nil
 }
 
 func (u *UserGRPCClient) Create(ctx context.Context, user models.User) error {
-	_, err := u.client.Create(ctx, &pb.CreateRequest{Name: user.Name, Email: user.Email, Password: user.Password})
-	log.Println("UserGRPCClient.Create error:", err)
+	_, err := u.client.Create(ctx, &pb.CreateRequest{Name: user.Name, Email: user.Email, Password: user.Password, Phone: user.Phone})
 	if err != nil {
 		return err
 	}

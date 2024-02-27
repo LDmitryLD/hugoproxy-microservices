@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"net/http"
@@ -9,7 +10,9 @@ import (
 	"projects/LDmitryLD/hugoproxy-microservices/auth/internal/models"
 	"projects/LDmitryLD/hugoproxy-microservices/auth/internal/modules/user/service"
 
-	"github.com/go-chi/jwtauth"
+	"github.com/go-chi/jwtauth/v5"
+	"github.com/golang-jwt/jwt"
+
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -80,6 +83,7 @@ func (a *Auth) Register(in RegisterIn) RegisterOut {
 		Name:     in.Name,
 		Email:    in.Email,
 		Password: hashPassword,
+		Phone:    in.Phone,
 	}
 
 	if err := a.user.Create(context.Background(), user); err != nil {
@@ -113,8 +117,11 @@ func (a *Auth) Login(in LoginIn) LoginOut {
 		}
 	}
 
-	_, claims, _ := jwtauth.FromContext(in.Ctx)
+	// _, claims, _ := jwtauth.FromContext(in.Ctx)
 
+	claims := jwt.MapClaims{
+		"id": fmt.Sprintf("%d", user.ID),
+	}
 	_, tokenString, _ := TokenAuth.Encode(claims)
 
 	return LoginOut{

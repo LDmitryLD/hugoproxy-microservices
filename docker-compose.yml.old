@@ -29,6 +29,18 @@ services:
     networks:
       - my_network  
 
+  notify:
+    restart: on-failure
+    container_name: notify
+    build: ./notify
+    env_file:
+      - ./notify/.env
+    networks:
+      - my_network  
+    depends_on:
+      - rabbit  
+      - geo
+  
   geo:
     restart: on-failure
     container_name: geo
@@ -37,7 +49,8 @@ services:
       - ./geo/.env
     depends_on:
       - db_geo
-      - redis    
+      - redis   
+      - rabbit 
     networks:
       - my_network 
 
@@ -141,6 +154,16 @@ services:
       - "6379:6379"    
     networks:
     - my_network    
+
+  rabbit:
+    image: rabbitmq:3-management
+    restart: on-failure
+    container_name: rabbit  
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - my_network  
 
 networks:
   my_network:

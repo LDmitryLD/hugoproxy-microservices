@@ -18,6 +18,7 @@ type AppConf struct {
 	Cache     Cache
 	RPCServer RPCServer
 	Logger    Logger
+	MQ        MQ
 }
 
 type DB struct {
@@ -29,6 +30,11 @@ type DB struct {
 	Port     string
 	MaxConn  int
 	Timeout  int
+}
+
+type MQ struct {
+	Host string
+	Port string
 }
 
 type Server struct {
@@ -62,6 +68,10 @@ func NewAppConf() AppConf {
 			Password: os.Getenv("DB_PASSWORD"),
 			Host:     os.Getenv("DB_HOST"),
 			Port:     os.Getenv("DB_PORT"),
+		},
+		MQ: MQ{
+			Host: os.Getenv("MQ_HOST"),
+			Port: os.Getenv("MQ_PORT"),
 		},
 		Cache: Cache{
 			Host: os.Getenv("REDIS_HOST"),

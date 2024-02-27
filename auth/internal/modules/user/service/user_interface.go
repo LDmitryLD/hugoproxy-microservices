@@ -18,12 +18,14 @@ type PrfileOut struct {
 	Name     string
 	Email    string
 	Password string
+	Phone    string
 }
 
 type CreateIn struct {
 	Name     string
 	Email    string
 	Password string
+	Phone    string
 }
 
 type CreateOut struct {

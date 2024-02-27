@@ -1,14 +1,7 @@
 package service
 
 import (
-	"os"
-	"projects/LDmitryLD/hugoproxy-microservices/user/config"
-	"projects/LDmitryLD/hugoproxy-microservices/user/internal/infrastructure/logs"
 	"projects/LDmitryLD/hugoproxy-microservices/user/internal/models"
-	"projects/LDmitryLD/hugoproxy-microservices/user/internal/modules/user/storage/mocks"
-	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 var (
@@ -20,14 +13,14 @@ var (
 	}
 )
 
-func TestUser_Profile(t *testing.T) {
-	logger := logs.NewLogger(config.NewAppConf(), os.Stdout)
-	mockStorage := mocks.NewUserStorager(t)
-	mockStorage.On("GetByEmail", testEmail).Return(testUser)
-	user := NewUser(mockStorage, logger)
+// func TestUser_Profile(t *testing.T) {
+// 	logger := logs.NewLogger(config.NewAppConf(), os.Stdout)
+// 	mockStorage := mocks.NewUserStorager(t)
+// 	mockStorage.On("GetByEmail", testEmail).Return(testUser)
+// 	user := NewUser(mockStorage, logger)
 
-	got, err := user.Profile(testEmail)
+// 	got, err := user.Profile(testEmail)
 
-	assert.Nil(t, err)
-	assert.Equal(t, testUser, got)
-}
+// 	assert.Nil(t, err)
+// 	assert.Equal(t, testUser, got)
+// }

@@ -16,8 +16,8 @@ func NewGeoServiceRPC(geoService service.Georer) *GeoServiceRPC {
 }
 
 func (g *GeoServiceRPC) SearchAddresses(in service.SearchAddressesIn, out *service.SearchAddressesOut) error {
-
-	*out = g.geoService.SearchAddresses(in)
+	ctx := context.Background()
+	*out = g.geoService.SearchAddresses(ctx, in)
 	return nil
 }
 
@@ -39,7 +39,8 @@ func NewGeoServiceGRPC(geoService service.Georer) *GeoServiceGRPC {
 }
 
 func (g *GeoServiceGRPC) SearchAddresses(ctx context.Context, in *pb.SearchAddressesRequest) (*pb.SearchAddressesResponse, error) {
-	address := g.geoService.SearchAddresses(service.SearchAddressesIn{Query: in.Query})
+	address := g.geoService.SearchAddresses(ctx, service.SearchAddressesIn{Query: in.Query})
+
 	response := pb.Address{
 		Lat: address.Address.Lat,
 		Lon: address.Address.Lon,

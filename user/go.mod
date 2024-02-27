@@ -3,7 +3,7 @@ module projects/LDmitryLD/hugoproxy-microservices/user
 go 1.19
 
 require (
-	github.com/LDmitryLD/protos v0.0.9
+	github.com/LDmitryLD/protos v0.0.13
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9

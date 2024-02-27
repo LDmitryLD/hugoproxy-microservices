@@ -7,10 +7,13 @@ import (
 	"projects/LDmitryLD/hugoproxy-microservices/geo/internal/db"
 	cache "projects/LDmitryLD/hugoproxy-microservices/geo/internal/infrastructure/cahe"
 	"projects/LDmitryLD/hugoproxy-microservices/geo/internal/infrastructure/component"
+	"projects/LDmitryLD/hugoproxy-microservices/geo/internal/infrastructure/mq"
 	"projects/LDmitryLD/hugoproxy-microservices/geo/internal/infrastructure/server"
 	"projects/LDmitryLD/hugoproxy-microservices/geo/internal/modules"
 	"projects/LDmitryLD/hugoproxy-microservices/geo/internal/storages"
+	"time"
 
+	"go.uber.org/ratelimit"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 )
@@ -59,6 +62,12 @@ func (a *App) Run() error {
 }
 
 func (a *App) Bootstrap(options ...interface{}) Runner {
+	rateLimit := ratelimit.New(5, ratelimit.Per(1*time.Minute))
+
+	mq, err := mq.NewRabbitMQ(a.conf.MQ, a.logger)
+	if err != nil {
+		a.logger.Fatal("new rabbit mq err", zap.Error(err))
+	}
 
 	_, sqlAdapter, err := db.NewSqlDB(a.conf.DB, a.logger)
 	if err != nil {
@@ -70,7 +79,7 @@ func (a *App) Bootstrap(options ...interface{}) Runner {
 		a.logger.Fatal("error init cache:", zap.Error(err))
 	}
 
-	components := component.NewComponents(a.conf, a.logger)
+	components := component.NewComponents(a.conf, a.logger, rateLimit, mq)
 
 	newStorages := storages.NewStorages(sqlAdapter, cacheClient, a.logger)
 

@@ -92,7 +92,7 @@ func NewAuthGRPCClient(client pb.AutherClient) *AuthGRPCClient {
 }
 
 func (g *AuthGRPCClient) Register(in RegisterIn) RegisterOut {
-	res, err := g.client.Register(context.Background(), &pb.RegisterRequest{Email: in.Email, Password: in.Password, Name: in.Name})
+	res, err := g.client.Register(context.Background(), &pb.RegisterRequest{Email: in.Email, Password: in.Password, Name: in.Name, Phone: in.Phone})
 	if err != nil {
 		switch status.Code(err) {
 		case codes.AlreadyExists:

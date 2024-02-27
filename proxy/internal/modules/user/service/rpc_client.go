@@ -102,6 +102,7 @@ func (u *UserGRPCClient) Profile(ctx context.Context, email string) (models.User
 	user := models.User{
 		Name:  res.Name,
 		Email: res.Email,
+		Phone: res.Phone,
 	}
 
 	return user, nil
@@ -117,6 +118,7 @@ func (u *UserGRPCClient) List(ctx context.Context) ([]models.User, error) {
 		u := models.User{
 			Name:  user.Name,
 			Email: user.Email,
+			Phone: user.Phone,
 		}
 		users[i] = u
 	}

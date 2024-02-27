@@ -3,7 +3,7 @@ module proxy
 go 1.19
 
 require (
-	github.com/LDmitryLD/protos v0.0.9
+	github.com/LDmitryLD/protos v0.0.13
 	github.com/go-chi/chi/v5 v5.0.11
 	github.com/go-chi/jwtauth/v5 v5.3.0
 	github.com/joho/godotenv v1.5.1

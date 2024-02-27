@@ -11,8 +11,10 @@ import (
 	"time"
 
 	pb "github.com/LDmitryLD/protos/gen/geogrpc"
+	"github.com/go-chi/jwtauth/v5"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 )
 
 const (
@@ -59,7 +61,7 @@ func NewGeoRPCClient(client *rpc.Client) *GeoRPCClient {
 	}
 }
 
-func (g *GeoRPCClient) SearchAddresses(in SearchAddressesIn) SearchAddressesOut {
+func (g *GeoRPCClient) SearchAddresses(ctx context.Context, in SearchAddressesIn) SearchAddressesOut {
 	var out SearchAddressesOut
 	err := g.client.Call("GeoServiceRPC.SearchAddresses", in, &out)
 	if err != nil {
@@ -89,9 +91,19 @@ func NewGeoGRPCCLient(client pb.GeorerClient) *GeoGRPCClient {
 	}
 }
 
-func (g *GeoGRPCClient) SearchAddresses(in SearchAddressesIn) SearchAddressesOut {
-	res, err := g.client.SearchAddresses(context.Background(), &pb.SearchAddressesRequest{Query: in.Query})
+func (g *GeoGRPCClient) SearchAddresses(ctx context.Context, in SearchAddressesIn) SearchAddressesOut {
+	_, claims, _ := jwtauth.FromContext(ctx)
 
+	md := metadata.New(map[string]string{
+		"id": claims["id"].(string),
+	})
+
+	newCtx := metadata.NewOutgoingContext(ctx, md)
+
+	res, err := g.client.SearchAddresses(newCtx, &pb.SearchAddressesRequest{Query: in.Query})
+	if err != nil {
+		return SearchAddressesOut{Err: err}
+	}
 	address := models.Address{
 		Lat: res.Address.Lat,
 		Lon: res.Address.Lon,

@@ -282,6 +282,10 @@
         "password": {
           "type": "string",
           "x-go-name": "Password"
+        },
+        "phone": {
+          "type": "string",
+          "x-go-name": "Phone"
         }
       },
       "x-go-package": "proxy/internal/modules/auth/controller"
@@ -316,6 +320,9 @@
           "type": "string"
         },
         "Name": {
+          "type": "string"
+        },
+        "Phone": {
           "type": "string"
         }
       },

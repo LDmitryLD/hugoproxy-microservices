@@ -28,24 +28,24 @@ func (a *AuthServiceRPC) Login(in service.LoginIn, out *service.LoginOut) error 
 }
 
 type AuthServiceGRPC struct {
-	userService service.Auther
+	authService service.Auther
 	pb.UnimplementedAutherServer
 }
 
 func NewUserServiceGRPC(userService service.Auther) *AuthServiceGRPC {
 	return &AuthServiceGRPC{
-		userService: userService,
+		authService: userService,
 	}
 }
 
 func (a *AuthServiceGRPC) Login(ctx context.Context, in *pb.LoginRequest) (*pb.LoginResponse, error) {
-	res := a.userService.Login(service.LoginIn{Ctx: ctx, Email: in.Email, Password: in.Password})
+	res := a.authService.Login(service.LoginIn{Ctx: ctx, Email: in.Email, Password: in.Password})
 
 	return &pb.LoginResponse{Success: res.Success, Message: res.Message}, nil
 }
 
 func (a *AuthServiceGRPC) Register(ctx context.Context, in *pb.RegisterRequest) (*pb.RegisterResponse, error) {
-	res := a.userService.Register(service.RegisterIn{Name: in.Name, Email: in.Email, Password: in.Password})
+	res := a.authService.Register(service.RegisterIn{Name: in.Name, Email: in.Email, Password: in.Password, Phone: in.Phone})
 	if res.Error != nil {
 		return &pb.RegisterResponse{
 			Status:  uint32(res.Status),

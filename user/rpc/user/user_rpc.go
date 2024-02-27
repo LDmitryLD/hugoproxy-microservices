@@ -75,7 +75,7 @@ func (g *UserServiceGRPC) Profile(ctx context.Context, in *pb.ProfileRequest) (*
 		return nil, err
 	}
 
-	return &pb.ProfileResponse{Name: user.Name, Email: user.Email, Passwrd: user.Password}, nil
+	return &pb.ProfileResponse{Id: uint32(user.ID), Name: user.Name, Email: user.Email, Passwrd: user.Password, Phone: user.Phone}, nil
 }
 
 func (g *UserServiceGRPC) List(ctx context.Context, in *pb.ListRequest) (*pb.ListResponse, error) {
@@ -89,6 +89,7 @@ func (g *UserServiceGRPC) List(ctx context.Context, in *pb.ListRequest) (*pb.Lis
 		users[i] = &pb.User{
 			Name:  user.Name,
 			Email: user.Email,
+			Phone: user.Phone,
 		}
 	}
 
@@ -96,10 +97,19 @@ func (g *UserServiceGRPC) List(ctx context.Context, in *pb.ListRequest) (*pb.Lis
 }
 
 func (g *UserServiceGRPC) Create(ctx context.Context, in *pb.CreateRequest) (*pb.CreateResponse, error) {
-	err := g.userService.Create(models.UserDTO{Name: in.Name, Email: in.Email, Password: in.Password})
+	err := g.userService.Create(models.UserDTO{Name: in.Name, Email: in.Email, Password: in.Password, Phone: in.Phone})
 	if err != nil {
 		return nil, err
 	}
 
 	return &pb.CreateResponse{Success: true}, nil
+}
+
+func (g *UserServiceGRPC) GetByID(ctx context.Context, in *pb.GetByIDRequest) (*pb.GetByIDResponse, error) {
+	res, err := g.userService.GeyByID(ctx, int(in.GetId()))
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.GetByIDResponse{Email: res.Email, Phone: res.Phone}, nil
 }

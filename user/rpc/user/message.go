@@ -9,6 +9,7 @@ type ProfileIn struct {
 type ProfileOut struct {
 	Name     string
 	Email    string
+	Phone    string
 	Password string
 }
 
@@ -21,6 +22,7 @@ type ListOut struct {
 type CreateIn struct {
 	Name     string
 	Email    string
+	Phone    string
 	Password string
 }
 

@@ -88,7 +88,7 @@ func (a *Auth) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	out := a.auth.Register(service.RegisterIn{Name: regReq.Name, Email: regReq.Email, Password: regReq.Password})
+	out := a.auth.Register(service.RegisterIn{Name: regReq.Name, Email: regReq.Email, Password: regReq.Password, Phone: regReq.Phone})
 	switch out.Status {
 	case http.StatusConflict:
 		http.Error(w, out.Message, http.StatusConflict)

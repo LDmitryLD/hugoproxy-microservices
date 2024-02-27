@@ -11,7 +11,7 @@ type Services struct {
 }
 
 func NewServices(storages *storages.Storages, components *component.Components) *Services {
-	geoService := geoservice.NewGeo(storages.Geo, components.Logger)
+	geoService := geoservice.NewGeo(storages.Geo, components.Logger, components.RateLimit, components.MQ)
 
 	return &Services{
 		Geo: geoService,

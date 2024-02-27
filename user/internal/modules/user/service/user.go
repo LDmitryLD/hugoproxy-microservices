@@ -1,7 +1,7 @@
 package service
 
 import (
-	"log"
+	"context"
 	"projects/LDmitryLD/hugoproxy-microservices/user/internal/models"
 	"projects/LDmitryLD/hugoproxy-microservices/user/internal/modules/user/storage"
 
@@ -23,7 +23,6 @@ func NewUser(storage storage.UserStorager, logger *zap.Logger) Userer {
 func (u *User) Profile(email string) (models.UserDTO, error) {
 	user, err := u.storage.GetByEmail(email)
 	if err != nil {
-		log.Println("user: User.Profile err:", err)
 		return models.UserDTO{}, err
 	}
 
@@ -41,4 +40,8 @@ func (u *User) Create(user models.UserDTO) error {
 
 func (u *User) List() ([]models.User, error) {
 	return u.storage.List()
+}
+
+func (u *User) GeyByID(ctx context.Context, id int) (models.User, error) {
+	return u.storage.GetByID(ctx, id)
 }

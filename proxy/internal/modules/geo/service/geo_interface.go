@@ -1,10 +1,13 @@
 package service
 
-import "proxy/internal/models"
+import (
+	"context"
+	"proxy/internal/models"
+)
 
 //go:generate go run github.com/vektra/mockery/v2@v2.35.4 --name=Georer
 type Georer interface {
-	SearchAddresses(in SearchAddressesIn) SearchAddressesOut
+	SearchAddresses(ctx context.Context, in SearchAddressesIn) SearchAddressesOut
 	GeoCode(in GeoCodeIn) GeoCodeOut
 }
 

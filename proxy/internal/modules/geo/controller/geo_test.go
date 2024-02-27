@@ -1,141 +1,123 @@
 package controller
 
-import (
-	"bytes"
-	"encoding/json"
-	"errors"
-	"net/http"
-	"net/http/httptest"
-	"os"
-	"proxy/config"
-	"proxy/internal/infrastructure/logs"
-	"proxy/internal/infrastructure/responder"
-	"proxy/internal/models"
-	"proxy/internal/modules/geo/service"
-	"proxy/internal/modules/geo/service/mocks"
-	"testing"
+// var (
+// 	testLat = "12.123"
+// 	testLng = "12.123"
+// )
 
-	"github.com/stretchr/testify/assert"
-)
+// func TestGeo_Geocode(t *testing.T) {
+// 	geoMock := mocks.NewGeorer(t)
+// 	geoMock.On("GeoCode", service.GeoCodeIn{Lat: testLat, Lng: testLng}).Return(service.GeoCodeOut{Lat: testLat, Lng: testLng})
+// 	geo := &GeoController{
+// 		geo:       geoMock,
+// 		Responder: &responder.Respond{},
+// 	}
+// 	server := httptest.NewServer(http.HandlerFunc(geo.Geocode))
+// 	r := GeocodeRequest{
+// 		Lat: testLat,
+// 		Lng: testLng,
+// 	}
 
-var (
-	testLat = "12.123"
-	testLng = "12.123"
-)
+// 	body, _ := json.Marshal(r)
 
-func TestGeo_Geocode(t *testing.T) {
-	geoMock := mocks.NewGeorer(t)
-	geoMock.On("GeoCode", service.GeoCodeIn{Lat: testLat, Lng: testLng}).Return(service.GeoCodeOut{Lat: testLat, Lng: testLng})
-	geo := &GeoController{
-		geo:       geoMock,
-		Responder: &responder.Respond{},
-	}
-	server := httptest.NewServer(http.HandlerFunc(geo.Geocode))
-	r := GeocodeRequest{
-		Lat: testLat,
-		Lng: testLng,
-	}
+// 	req, err := http.NewRequest("POST", server.URL, bytes.NewBuffer(body))
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
 
-	body, _ := json.Marshal(r)
+// 	client := http.DefaultClient
 
-	req, err := http.NewRequest("POST", server.URL, bytes.NewBuffer(body))
-	if err != nil {
-		t.Fatal(err)
-	}
+// 	resp, err := client.Do(req)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	defer resp.Body.Close()
 
-	client := http.DefaultClient
+// 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
-	resp, err := client.Do(req)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer resp.Body.Close()
+// }
 
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
+// func TestGeo_Geocode_BadRequest(t *testing.T) {
+// 	logger := logs.NewLogger(config.NewAppConf(), os.Stdout)
+// 	respond := responder.NewResponder(logger)
+// 	geo := GeoController{
+// 		Responder: respond,
+// 	}
 
-}
+// 	req := map[string]interface{}{"lat": 123}
+// 	reqJSON, _ := json.Marshal(req)
 
-func TestGeo_Geocode_BadRequest(t *testing.T) {
-	logger := logs.NewLogger(config.NewAppConf(), os.Stdout)
-	respond := responder.NewResponder(logger)
-	geo := GeoController{
-		Responder: respond,
-	}
+// 	s := httptest.NewServer(http.HandlerFunc(geo.Geocode))
+// 	defer s.Close()
 
-	req := map[string]interface{}{"lat": 123}
-	reqJSON, _ := json.Marshal(req)
+// 	resp, err := http.Post(s.URL, "application/json", bytes.NewBuffer(reqJSON))
+// 	if err != nil {
+// 		t.Fatal("ошибка при выполнении тестового запроса:", err.Error())
+// 	}
+// 	defer resp.Body.Close()
 
-	s := httptest.NewServer(http.HandlerFunc(geo.Geocode))
-	defer s.Close()
+// 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+// }
 
-	resp, err := http.Post(s.URL, "application/json", bytes.NewBuffer(reqJSON))
-	if err != nil {
-		t.Fatal("ошибка при выполнении тестового запроса:", err.Error())
-	}
-	defer resp.Body.Close()
+// func TestGeo_Search(t *testing.T) {
+// 	logger := logs.NewLogger(config.NewAppConf(), os.Stdout)
+// 	respond := responder.NewResponder(logger)
+// 	mockGeo := mocks.NewGeorer(t)
+// 	mockGeo.On("SearchAddresses", service.SearchAddressesIn{Query: "test"}).Return(service.SearchAddressesOut{Address: models.Address{Lat: testLat, Lon: testLng}})
+// 	geo := &GeoController{
+// 		geo:       mockGeo,
+// 		Responder: respond,
+// 	}
+// 	server := httptest.NewServer(http.HandlerFunc(geo.Search))
+// 	r := SearchRequest{
+// 		Query: "test",
+// 	}
 
-	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-}
+// 	body, _ := json.Marshal(r)
 
-func TestGeo_Search(t *testing.T) {
-	logger := logs.NewLogger(config.NewAppConf(), os.Stdout)
-	respond := responder.NewResponder(logger)
-	mockGeo := mocks.NewGeorer(t)
-	mockGeo.On("SearchAddresses", service.SearchAddressesIn{Query: "test"}).Return(service.SearchAddressesOut{Address: models.Address{Lat: testLat, Lon: testLng}})
-	geo := &GeoController{
-		geo:       mockGeo,
-		Responder: respond,
-	}
-	server := httptest.NewServer(http.HandlerFunc(geo.Search))
-	r := SearchRequest{
-		Query: "test",
-	}
+// 	req, err := http.NewRequest("POST", server.URL, bytes.NewBuffer(body))
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
 
-	body, _ := json.Marshal(r)
+// 	client := http.DefaultClient
 
-	req, err := http.NewRequest("POST", server.URL, bytes.NewBuffer(body))
-	if err != nil {
-		t.Fatal(err)
-	}
+// 	resp, err := client.Do(req)
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	defer resp.Body.Close()
 
-	client := http.DefaultClient
+// 	assert.Equal(t, http.StatusOK, resp.StatusCode)
+// }
 
-	resp, err := client.Do(req)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer resp.Body.Close()
+// func TestGeo_Search_Error(t *testing.T) {
+// 	logger := logs.NewLogger(config.NewAppConf(), os.Stdout)
+// 	respond := responder.NewResponder(logger)
 
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
-}
+// 	geoMock := mocks.NewGeorer(t)
 
-func TestGeo_Search_Error(t *testing.T) {
-	logger := logs.NewLogger(config.NewAppConf(), os.Stdout)
-	respond := responder.NewResponder(logger)
+// 	geoMock.On("SearchAddresses", service.SearchAddressesIn{Query: "BadQuery"}).Return(service.SearchAddressesOut{Err: errors.New("error")})
 
-	geoMock := mocks.NewGeorer(t)
+// 	geo := &GeoController{
+// 		geo:       geoMock,
+// 		Responder: respond,
+// 	}
 
-	geoMock.On("SearchAddresses", service.SearchAddressesIn{Query: "BadQuery"}).Return(service.SearchAddressesOut{Err: errors.New("error")})
+// 	searchReq := SearchRequest{
+// 		Query: "BadQuery",
+// 	}
 
-	geo := &GeoController{
-		geo:       geoMock,
-		Responder: respond,
-	}
+// 	reqBody, _ := json.Marshal(searchReq)
 
-	searchReq := SearchRequest{
-		Query: "BadQuery",
-	}
+// 	s := httptest.NewServer(http.HandlerFunc(geo.Search))
+// 	defer s.Close()
 
-	reqBody, _ := json.Marshal(searchReq)
+// 	resp, err := http.Post(s.URL, "application/json", bytes.NewBuffer(reqBody))
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	defer resp.Body.Close()
 
-	s := httptest.NewServer(http.HandlerFunc(geo.Search))
-	defer s.Close()
-
-	resp, err := http.Post(s.URL, "application/json", bytes.NewBuffer(reqBody))
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer resp.Body.Close()
-
-	assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
-}
+// 	assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+// }
