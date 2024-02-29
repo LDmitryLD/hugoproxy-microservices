@@ -4,15 +4,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"projects/LDmitryLD/hugoproxy-microservices/notify/config"
 	"projects/LDmitryLD/hugoproxy-microservices/notify/internal/infrastructure/errors"
 	notifyservice "projects/LDmitryLD/hugoproxy-microservices/notify/internal/infrastructure/service"
+	"projects/LDmitryLD/hugoproxy-microservices/notify/internal/modules/mq"
 	"projects/LDmitryLD/hugoproxy-microservices/notify/internal/modules/user/service"
 	"projects/LDmitryLD/hugoproxy-microservices/notify/internal/provider"
 
-	"github.com/streadway/amqp"
-	"gitlab.com/ptflp/gopubsub/rabbitmq"
 	"go.uber.org/zap"
 )
 
@@ -38,20 +36,20 @@ func (a *App) Run() int {
 
 	notifier := notifyservice.NewNotify(a.conf.Provider.Email, email, phone, a.logger)
 
-	url := fmt.Sprintf("amqp://guest:guest@%s:%s/", a.conf.MQ.Host, a.conf.MQ.Port)
-	conn, err := amqp.Dial(url)
-	if err != nil {
-		a.logger.Fatal("connec rabbitMQ err", zap.Error(err))
-	}
-	defer conn.Close()
+	// url := fmt.Sprintf("amqp://guest:guest@%s:%s/", a.conf.MQ.Host, a.conf.MQ.Port)
+	// conn, err := amqp.Dial(url)
+	// if err != nil {
+	// 	a.logger.Fatal("connec rabbitMQ err", zap.Error(err))
+	// }
+	// defer conn.Close()
 
-	rmq, err := rabbitmq.NewRabbitMQ(conn)
+	mq, err := mq.GetMessageQueue(a.conf.MQ, a.logger)
 	if err != nil {
 		a.logger.Fatal("create rmq err", zap.Error(err))
 	}
-	defer rmq.Close()
+	defer mq.Close()
 
-	messages, err := rmq.Subscribe("rate_limit")
+	messages, err := mq.Subscribe("rate_limit")
 	if err != nil {
 		a.logger.Fatal("subscribe rate_limit err", zap.Error(err))
 	}
@@ -102,7 +100,7 @@ func (a *App) Run() int {
 			select {
 			case msg, ok := <-messages:
 				if !ok {
-					a.logger.Error("RabbitMQ chan clossed")
+					a.logger.Error("mq chan clossed")
 					errChan <- errors.RabbitMqClosedChan
 					return
 				}
@@ -129,6 +127,11 @@ func (a *App) Run() int {
 					errChan <- out.ErrorCode
 					return
 				}
+				//
+				if err := mq.Ack(&msg); err != nil {
+					a.logger.Error("Failed to acknowledge message", zap.Error(err))
+				}
+				//
 			case <-ctx.Done():
 				return
 			}

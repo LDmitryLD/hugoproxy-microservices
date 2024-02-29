@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/LDmitryLD/protos v0.0.13 // indirect
+	github.com/confluentinc/confluent-kafka-go v1.9.2 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/streadway/amqp v1.1.0 // indirect

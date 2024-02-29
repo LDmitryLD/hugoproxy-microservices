@@ -20,8 +20,10 @@ type UserRPC struct {
 }
 
 type MQ struct {
-	Host string
-	Port string
+	Host    string
+	Port    string
+	Type    string
+	GroupID string
 }
 
 type Logger struct {
@@ -51,8 +53,10 @@ func NewAppConf() AppConf {
 			Level: os.Getenv("LOGGER_LEVEL"),
 		},
 		MQ: MQ{
-			Host: os.Getenv("MQ_HOST"),
-			Port: os.Getenv("MQ_PORT"),
+			Host:    os.Getenv("MQ_HOST"),
+			Port:    os.Getenv("MQ_PORT"),
+			Type:    os.Getenv("MQ_TYPE"),
+			GroupID: os.Getenv("MQ_GROUP"),
 		},
 	}
 }

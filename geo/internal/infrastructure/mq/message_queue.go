@@ -5,12 +5,34 @@ import (
 	"projects/LDmitryLD/hugoproxy-microservices/geo/config"
 
 	"github.com/streadway/amqp"
+	"gitlab.com/ptflp/gopubsub/kafkamq"
 	"gitlab.com/ptflp/gopubsub/queue"
 	"gitlab.com/ptflp/gopubsub/rabbitmq"
 	"go.uber.org/zap"
 )
 
-func NewRabbitMQ(conf config.MQ, logger *zap.Logger) (queue.MessageQueuer, error) {
+// type MessageQueue struct {
+// 	mq queue.MessageQueuer
+// }
+
+func GetMessageQueue(conf config.MQ, logger *zap.Logger) (queue.MessageQueuer, error) {
+	switch conf.Type {
+	case "rabbit":
+		return newRabbitMQ(conf, logger)
+	case "kafka":
+		return newKafkaMQ(conf, logger)
+	default:
+		return nil, fmt.Errorf("invalid mq type %s", conf.Type)
+	}
+}
+
+func newKafkaMQ(conf config.MQ, logger *zap.Logger) (queue.MessageQueuer, error) {
+	broker := fmt.Sprintf("%s:%s", conf.Host, conf.Port)
+	return kafkamq.NewKafkaMQ(broker, conf.GroupID)
+
+}
+
+func newRabbitMQ(conf config.MQ, logger *zap.Logger) (queue.MessageQueuer, error) {
 	url := fmt.Sprintf("amqp://guest:guest@%s:%s/", conf.Host, conf.Port)
 	conn, err := amqp.Dial(url)
 	if err != nil {

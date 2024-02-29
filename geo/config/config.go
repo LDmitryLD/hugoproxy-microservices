@@ -33,8 +33,10 @@ type DB struct {
 }
 
 type MQ struct {
-	Host string
-	Port string
+	Host    string
+	Port    string
+	Type    string
+	GroupID string
 }
 
 type Server struct {
@@ -70,8 +72,10 @@ func NewAppConf() AppConf {
 			Port:     os.Getenv("DB_PORT"),
 		},
 		MQ: MQ{
-			Host: os.Getenv("MQ_HOST"),
-			Port: os.Getenv("MQ_PORT"),
+			Host:    os.Getenv("MQ_HOST"),
+			Port:    os.Getenv("MQ_PORT"),
+			Type:    os.Getenv("MQ_TYPE"),
+			GroupID: os.Getenv("MQ_GROUP"),
 		},
 		Cache: Cache{
 			Host: os.Getenv("REDIS_HOST"),

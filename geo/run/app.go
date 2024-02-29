@@ -64,7 +64,7 @@ func (a *App) Run() error {
 func (a *App) Bootstrap(options ...interface{}) Runner {
 	rateLimit := ratelimit.New(5, ratelimit.Per(1*time.Minute))
 
-	mq, err := mq.NewRabbitMQ(a.conf.MQ, a.logger)
+	mq, err := mq.GetMessageQueue(a.conf.MQ, a.logger)
 	if err != nil {
 		a.logger.Fatal("new rabbit mq err", zap.Error(err))
 	}
